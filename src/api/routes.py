@@ -7,6 +7,12 @@ import shutil
 import logging
 
 from src.pipeline.complete_verifier import CompleteCertificateVerifier
+from src.core.schemas import VerificationResult
+from pydantic import BaseModel
+
+class ManualVerificationRequest(BaseModel):
+    certificate_id: str
+    issuer_url: str
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -19,6 +25,32 @@ def get_verifier():
         _verifier = CompleteCertificateVerifier()
     return _verifier
 
+@router.post("/verify/manual", response_model=VerificationResult)
+async def manual_verify_certificate(request: ManualVerificationRequest):
+    """Manually verify a certificate using ID and URL"""
+    try:
+        verifier = get_verifier()
+        # Access the underlying verification agent from the verifier pipeline
+        # Note: Depending on implementation, you might need to adjust this access
+        if hasattr(verifier, 'verification_service'):
+             result = await verifier.verification_service.manual_verify(
+                 request.certificate_id, 
+                 request.issuer_url
+             )
+             return result
+        else:
+            # Fallback if service not directly accessible
+            from src.agents.verification.service import VerificationAgent
+            agent = VerificationAgent()
+            result = await agent.manual_verify(
+                request.certificate_id,
+                request.issuer_url
+            )
+            return result
+    except Exception as e:
+        logger.exception("Manual verification failed")
+        raise HTTPException(status_code=500, detail=f"Manual verification failed: {str(e)}")
+
 @router.post("/verify")
 async def verify_certificate(file: UploadFile = File(...)):
     """Verify certificate using OCR + verification pipeline"""
@@ -28,6 +60,7 @@ async def verify_certificate(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=f"Invalid file type: {file.content_type}")
 
     tmp_path = None
+    _response_data: dict = {}
 
     try:
         # -------------------------
@@ -65,6 +98,9 @@ async def verify_certificate(file: UploadFile = File(...)):
             },
         }
 
+        # Capture data for the finally block before returning
+        _response_data = response.get("data", {})
+
         if best_result.get("verification", {}).get("is_verified"):
             logger.info(f"✅ [API] Certificate validated successfully!")
         else:
@@ -89,12 +125,9 @@ async def verify_certificate(file: UploadFile = File(...)):
             history = get_history()
             history.add_verification({
                 "filename": file.filename,
-                "extracted_data": response["data"]["extracted_data"]
-                    if "response" in locals() else {},
-                "verification": response["data"]["verification"]
-                    if "response" in locals() else {},
-                "forensics": response["data"]["forensics"]
-                    if "response" in locals() else {},
+                "extracted_data": _response_data.get("extracted_data", {}),
+                "verification": _response_data.get("verification", {}),
+                "forensics": _response_data.get("forensics", {}),
             })
             logger.info("[INFO] Verification saved to history")
 

@@ -36,7 +36,10 @@ print("-"*60)
 # Build a better prompt specifically for your certificate
 full_text = paddle_result.get('raw_text', '')
 
-from mistralai import Mistral
+try:
+    from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
+except ImportError:
+    from mistralai import Mistral          # newer SDK (Mac)
 import os
 from dotenv import load_dotenv
 import json

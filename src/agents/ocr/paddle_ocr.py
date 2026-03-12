@@ -2,7 +2,6 @@
 Simple PaddleOCR Wrapper for v3.3.2 with detailed debugging
 """
 
-from paddleocr import PaddleOCR
 import logging
 from typing import Dict, Any
 import os
@@ -15,9 +14,19 @@ class SimplePaddleOCR:
     
     def __init__(self):
         try:
+            # Import inside try so a missing paddleocr package won't crash the backend on startup
+            from paddleocr import PaddleOCR
+
             os.environ['DISABLE_MODEL_SOURCE_CHECK'] = 'True'
-            self.reader = PaddleOCR(lang='en', use_gpu=True)
-            logger.info("[INFO] PaddleOCR v3.3.2 initialized (GPU enabled)")
+            # Detect if a GPU is available; fall back to CPU gracefully (important for EC2 CPU instances)
+            try:
+                import paddle
+                use_gpu = paddle.device.get_device().startswith('gpu')
+            except Exception:
+                use_gpu = False
+
+            self.reader = PaddleOCR(lang='en', use_gpu=use_gpu)
+            logger.info(f"[INFO] PaddleOCR initialized (GPU={use_gpu})")
             self.available = True
         except Exception as e:
             logger.error(f"[ERROR] PaddleOCR init failed: {e}")

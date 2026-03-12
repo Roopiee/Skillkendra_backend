@@ -6,7 +6,10 @@ import os
 import json
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
-from mistralai import Mistral
+try:
+    from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
+except ImportError:
+    from mistralai import Mistral          # newer SDK (Mac)
 
 from core.models import OCRResult, ExtractedEvidence, OCREngine
 

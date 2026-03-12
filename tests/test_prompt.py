@@ -2,7 +2,10 @@
 
 import os
 from dotenv import load_dotenv
-from mistralai import Mistral
+try:
+    from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
+except ImportError:
+    from mistralai import Mistral          # newer SDK (Mac)
 
 load_dotenv()
 client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))

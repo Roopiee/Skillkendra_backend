@@ -7,7 +7,10 @@ import base64
 import json
 import os
 from typing import Dict, Any
-from mistralai import Mistral
+try:
+    from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
+except ImportError:
+    from mistralai import Mistral          # newer SDK (Mac)
 from dotenv import load_dotenv
 import logging
 

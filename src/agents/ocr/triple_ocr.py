@@ -10,7 +10,10 @@ from src.agents.ocr.easy_ocr import SimpleEasyOCR
 from src.agents.ocr.mistral_ocr import EnhancedMistralOCR
 from src.agents.ocr.tesseract_ocr import TesseractOCR
 from src.agents.ocr.paddle_ocr import SimplePaddleOCR
-from mistralai import Mistral
+try:
+    from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
+except ImportError:
+    from mistralai import Mistral          # newer SDK (Mac)
 import os
 import re
 
