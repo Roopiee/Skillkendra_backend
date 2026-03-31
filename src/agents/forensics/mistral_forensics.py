@@ -11,7 +11,7 @@ try:
     from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
 except ImportError:
     from mistralai import Mistral          # newer SDK (Mac)
-from dotenv import load_dotenv
+    from dotenv import load_dotenv
 import logging
 
 logger = logging.getLogger(__name__)

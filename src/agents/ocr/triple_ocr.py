@@ -25,7 +25,7 @@ MISTRAL_EXTRACTION_PROMPT = """Extract structured data from this certificate tex
 
 Return JSON:
 {{
-  "student_name": "Full name",
+  "candidate_name": "Full name",
   "issuer": "Organization",
   "course_name": "Course name",
   "completion_date": "YYYY-MM-DD",
@@ -167,7 +167,7 @@ class TripleOCR:
             structured = self._structure_raw_text(raw_text, "PaddleOCR")
             
             if structured:
-                logger.info(f"[FALLBACK] Structured: {structured.get('student_name')}, {structured.get('issuer')}")
+                logger.info(f"[FALLBACK] Structured: {structured.get('candidate_name')}, {structured.get('issuer')}")
                 urls = self._extract_and_validate_urls(structured)
                 if urls:
                     logger.info(f"[FALLBACK SUCCESS] ✅ PaddleOCR found {len(urls)} URL(s): {urls}")
@@ -222,7 +222,7 @@ class TripleOCR:
             raw_text = result.get("raw_text", "")
             structured = await self._structure_raw_text_async(raw_text, "EasyOCR")
             
-            logger.info(f"[OCR] EasyOCR complete. Found: {structured.get('student_name')}")
+            logger.info(f"[OCR] EasyOCR complete. Found: {structured.get('candidate_name')}")
             return {
                 "engine": "easyocr",
                 "success": True,
@@ -254,7 +254,7 @@ class TripleOCR:
                 }
             
             structured = result.get("structured_data", {})
-            logger.info(f"[OCR] Mistral complete. Found: {structured.get('student_name')}")
+            logger.info(f"[OCR] Mistral complete. Found: {structured.get('candidate_name')}")
             return {
                 "engine": "mistral",
                 "success": True,
@@ -287,7 +287,7 @@ class TripleOCR:
             raw_text = result.get("raw_text", "")
             structured = await self._structure_raw_text_async(raw_text, "Tesseract")
             
-            logger.info(f"[OCR] Tesseract complete. Found: {structured.get('student_name')}")
+            logger.info(f"[OCR] Tesseract complete. Found: {structured.get('candidate_name')}")
             return {
                 "engine": "tesseract",
                 "success": True,
@@ -314,7 +314,7 @@ class TripleOCR:
             self._process_tesseract_ocr(image_path)
         ]
         
-        results = await asyncio.gather(*tasks)
+        results = list(await asyncio.gather(*tasks))
         
         successful = sum(1 for r in results if r['success'])
         logger.info(f"[PARALLEL OCR] {successful}/3 engines succeeded")

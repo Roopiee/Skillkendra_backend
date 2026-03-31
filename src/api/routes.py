@@ -117,24 +117,6 @@ async def verify_certificate(file: UploadFile = File(...)):
 
     finally:
         # -------------------------
-        # Save verification history (NON-BLOCKING)
-        # -------------------------
-        try:
-            from src.database.models import get_history
-
-            history = get_history()
-            history.add_verification({
-                "filename": file.filename,
-                "extracted_data": _response_data.get("extracted_data", {}),
-                "verification": _response_data.get("verification", {}),
-                "forensics": _response_data.get("forensics", {}),
-            })
-            logger.info("[INFO] Verification saved to history")
-
-        except Exception as e:
-            logger.warning(f"[WARNING] Failed to save verification history: {e}")
-
-        # -------------------------
         # Cleanup temp file
         # -------------------------
         if tmp_path and os.path.exists(tmp_path):

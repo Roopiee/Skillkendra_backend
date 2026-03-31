@@ -66,7 +66,7 @@ class VerificationService:
             cert_ids = list(cert_ids.values())
         
         return ExtractionResult(
-            candidate_name=_to_str(evidence_data.get('student_name')),
+            candidate_name=_to_str(evidence_data.get('candidate_name')),
             issuer_name=issuer_enum,
             issuer_org=_to_str(raw_issuer),
             issuer_url=urls[0] if urls else None,

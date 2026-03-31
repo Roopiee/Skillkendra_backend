@@ -1,5 +1,5 @@
 """
-FastAPI Application with History tracking
+FastAPI Application for OCR Pipeline
 """
 
 import logging
@@ -14,9 +14,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 app = FastAPI(
-    title="Certificate Verification API",
-    description="AI-powered verification with history tracking",
-    version="2.0.0"
+    title="SkillKendra OCR Pipeline",
+    description="OCR and Playwright processing pipeline for certificates",
+    version="1.0.0"
 )
 
 # CORS
@@ -29,17 +29,15 @@ app.add_middleware(
 )
 
 # Import routes
-from src.api import routes, history, auth
+from src.api import routes
 
-app.include_router(routes.router, prefix="/api/v1", tags=["verification"])
-app.include_router(history.router, prefix="/api/v1/history", tags=["history"])
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
+app.include_router(routes.router, prefix="/api", tags=["verification"])
 
 @app.get("/")
 async def root():
     return {
-        "message": "Certificate Verification API v2.0",
-        "features": ["OCR", "Forensics", "Verification", "History", "Authentication"],
+        "message": "SkillKendra OCR Pipeline",
+        "features": ["OCR", "Forensics", "Verification"],
         "docs": "/docs"
     }
 

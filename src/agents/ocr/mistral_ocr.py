@@ -180,7 +180,7 @@ class EnhancedMistralOCR:
             full_prompt = """Extract general information from this certificate:
 
 {
-  "student_name": "Full name",
+  "candidate_name": "Full name",
   "issuer": "Organization",
   "course_name": "Course name",
   "completion_date": "YYYY-MM-DD",
@@ -227,7 +227,7 @@ Read each character individually. Return ONLY JSON."""
             else:
                 logger.warning("[WARNING] Pass 2 failed, using Pass 1 results only")
             
-            logger.info(f"[INFO] Final extracted data: {general_data.get('student_name')}, {general_data.get('issuer')}")
+            logger.info(f"[INFO] Final extracted data: {general_data.get('candidate_name')}, {general_data.get('issuer')}")
             
             return {
                 "success": True,
