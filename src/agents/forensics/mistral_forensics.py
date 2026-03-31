@@ -2,21 +2,21 @@
 Mistral Forensics with PDF Support
 Converts PDFs to images before analysis
 """
-
 import base64
 import json
 import os
 from typing import Dict, Any
+from dotenv import load_dotenv   
+
 try:
     from mistralai.client import Mistral  # older SDK (EC2 Ubuntu)
 except ImportError:
     from mistralai import Mistral          # newer SDK (Mac)
-    from dotenv import load_dotenv
+
 import logging
 
 logger = logging.getLogger(__name__)
 
-load_dotenv()
 
 
 class MistralForensics:

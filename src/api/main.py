@@ -3,6 +3,10 @@ FastAPI Application for OCR Pipeline
 """
 
 import logging
+# Import routes
+from src.api import routes
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,8 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Import routes
-from src.api import routes
+
 
 app.include_router(routes.router, prefix="/api", tags=["verification"])
 
